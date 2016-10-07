@@ -4,4 +4,4 @@ from beagle import Beagle
 dataset = data('titanic')
 b = Beagle(dataset)
 
-b.generate()
+b.start_exploring()

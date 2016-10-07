@@ -1,6 +1,13 @@
-class scatter_plotter(object):
-    def applicable_score(self, dataset, dataset_meta):
-        return 0
+class PlotterMetaclass(object):
+    def __init__(self, figsize):
+        self.figsize = figsize
 
-    def generate_splot(self, data, filename):
+
+class ScatterPlotter(PlotterMetaclass):
+    @staticmethod
+    def appropriate_score(column_names, dataset, dataset_meta):
+        """Returns a score for appropriateness of this plot, plus explanation"""
+        return 0, 'Not Implemented yet'
+
+    def generate_plot(self, data, filename):
         pass
