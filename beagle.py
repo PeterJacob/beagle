@@ -3,7 +3,11 @@ import plotting
 
 class Beagle(object):
     default_plot_classes = [
-        plotting.ScatterPlotter
+        plotting.SimpleCountPlot,
+        plotting.SimpleDistPlot,
+        plotting.SimpleScatterPlot,
+        plotting.SimpleBoxPlot,
+        plotting.SimpleMosaicPlot
     ]
 
     def __init__(self, dataset):
@@ -12,12 +16,12 @@ class Beagle(object):
         self.column_names = list(self.dataset)
         self.column_meta = self.generate_column_meta()
 
-        self.base_dir = "./"
+        self.base_dir = "./out/" # Terminate with a slash
         self.base_figsize = (6, 4.5)
         self.file_num = 0
 
     def generate_column_meta(self):
-        """Returns metadata used by determine applicableness of plots"""
+        """Returns metadata used to determine applicableness of plots"""
         meta = {}
         for column_name in self.column_names:
             n_unique = self.dataset[column_name].nunique()
@@ -35,23 +39,56 @@ class Beagle(object):
         return meta
 
     def start_exploring(self):
+        # One dimension
+        file_nums_used = []
         for column_name in self.column_names:
-            self.generate_appropriate_plots([column_name], 2)
-
-    def dive_deeper_into(self, topic):
-        pass
+            used = self.generate_appropriate_plots([column_name], 2)
+            file_nums_used += used
+        
+        filename = self.base_dir + 'index.html'
+        self.generate_html(filename, file_nums_used)
+        
+        # Two dimensions
+        for i1, column_name1 in enumerate(self.column_names):
+            file_nums_used = []
+            used = self.generate_appropriate_plots([column_name1], 1)
+            file_nums_used += used
+            for i2, column_name2 in enumerate(self.column_names):
+                if i2 == i1:
+                    continue  # Do not cross with self
+                column_names = [column_name1, column_name2]
+                used = self.generate_appropriate_plots(column_names, 2)
+                file_nums_used += used
+        
+            filename = self.base_dir + column_name1 + '.html'
+            self.generate_html(filename, file_nums_used)
+    
+    def generate_html(self, html_filename, fig_info):
+        header = "<html><body>"
+        footer = "</body></html>"
+        middle_template = '<p><a href="{}"><img src="{}" /></a></p>'
+        middle = ""
+        for filenum, columns in list(fig_info):
+            link_filename = '-'.join(columns) + '.html'
+            fig_filename = str(filenum) + '.png'
+            middle += middle_template.format(link_filename, fig_filename)
+        
+        with open(html_filename, 'w') as f:
+            f.write(header + middle + footer)
 
     def generate_appropriate_plots(self, columns, threshold):
-        """For one or multiple columns of data, generates plots above threshold"""
-        file_nums_used = set()
+        """For one or multiple columns, generates plots above threshold"""
+        file_nums_used = []
         for plot_class in self.default_plot_classes:
-            score, reason = plot_class.appropriate_score(
+            score = plot_class.appropriate_score(
                 columns, self.dataset, self.column_meta)
 
             if score >= threshold:
                 filename = self.base_dir + str(self.file_num) + '.png'
-                file_nums_used.add(self.file_num)
+                file_nums_used.append((self.file_num, columns))
                 self.file_num += 1
 
-                pc = plot_class(self.base_figsize)
-                pc.generate_plot(self.dataset, filename)
+                plot_class.generate_plot(
+                    columns, self.dataset, self.column_meta,
+                    filename, self.base_figsize)
+        return file_nums_used
