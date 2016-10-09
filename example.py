@@ -1,7 +1,7 @@
 from pydataset import data
 from beagle import Beagle
 
-dataset = data('titanic')
-b = Beagle(dataset)
+dataset = data('iris')
+b = Beagle(dataset, base_dir='./out/')
 
 b.start_exploring()

@@ -4,19 +4,32 @@ import plotting
 class Beagle(object):
     default_plot_classes = [
         plotting.SimpleCountPlot,
-        plotting.SimpleDistPlot,
+        plotting.OneDimKernelEstimationPlot,
+        plotting.TwoDimKernelEstimationPlot,
         plotting.SimpleScatterPlot,
+        plotting.ColoredScatterPlot,
         plotting.SimpleBoxPlot,
+        plotting.SimpleSwarmPlot,
+        plotting.SimpleViolinPlot,
         plotting.SimpleMosaicPlot
     ]
 
-    def __init__(self, dataset):
-        """For now assumes dataset to be a pandas dataframe"""
+    def __init__(self, dataset, base_dir='./out/'):
+        """Interactive data exploration tool
+        
+        Args:
+            dataset (DataFrame): Data to perform exploration on. For now
+                assumes dataset to be a Pandas dataframe. May do duck-typing
+                later.
+            base_dir (str): Location to write generated content to.
+                Terminate with a slash.
+        """
         self.dataset = dataset
+        self.base_dir = base_dir
+        
         self.column_names = list(self.dataset)
         self.column_meta = self.generate_column_meta()
 
-        self.base_dir = "./out/" # Terminate with a slash
         self.base_figsize = (6, 4.5)
         self.file_num = 0
 
@@ -39,6 +52,7 @@ class Beagle(object):
         return meta
 
     def start_exploring(self):
+        """Write files required to explore to disk"""
         # One dimension
         file_nums_used = []
         for column_name in self.column_names:
@@ -48,7 +62,7 @@ class Beagle(object):
         filename = self.base_dir + 'index.html'
         self.generate_html(filename, file_nums_used)
         
-        # Two dimensions
+        # One dimension detail + two dimensions
         for i1, column_name1 in enumerate(self.column_names):
             file_nums_used = []
             used = self.generate_appropriate_plots([column_name1], 1)
@@ -61,6 +75,20 @@ class Beagle(object):
                 file_nums_used += used
         
             filename = self.base_dir + column_name1 + '.html'
+            self.generate_html(filename, file_nums_used)
+        
+        # Two dimention detail
+        for i1, column_name1 in enumerate(self.column_names):
+            file_nums_used = []
+            for i2, column_name2 in enumerate(self.column_names):
+                if i2 == i1:
+                    continue  # Do not cross with self
+                column_names = [column_name1, column_name2]
+                used = self.generate_appropriate_plots(column_names, 1)
+                file_nums_used += used
+        
+            filename = '{}{}-{}.html'.format(
+                self.base_dir, column_name1, column_name2)
             self.generate_html(filename, file_nums_used)
     
     def generate_html(self, html_filename, fig_info):
