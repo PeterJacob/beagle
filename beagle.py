@@ -79,17 +79,16 @@ class Beagle(object):
         
         # Two dimention detail
         for i1, column_name1 in enumerate(self.column_names):
-            file_nums_used = []
             for i2, column_name2 in enumerate(self.column_names):
                 if i2 == i1:
                     continue  # Do not cross with self
+
                 column_names = [column_name1, column_name2]
-                used = self.generate_appropriate_plots(column_names, 1)
-                file_nums_used += used
-        
-            filename = '{}{}-{}.html'.format(
-                self.base_dir, column_name1, column_name2)
-            self.generate_html(filename, file_nums_used)
+                file_nums_used = self.generate_appropriate_plots(column_names, 1)
+
+                filename = '{}{}-{}.html'.format(
+                    self.base_dir, column_name1, column_name2)
+                self.generate_html(filename, file_nums_used)
     
     def generate_html(self, html_filename, fig_info):
         header = "<html><body>"
