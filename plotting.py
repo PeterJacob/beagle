@@ -289,3 +289,16 @@ class SimpleMosaicPlot(object):
         plt.tight_layout()
         plt.savefig(filename)
         plt.close()
+
+all_plot_classes = [
+    SimpleCountPlot,
+    CategoryCountPlot,
+    OneDimKernelEstimationPlot,
+    TwoDimKernelEstimationPlot,
+    SimpleScatterPlot,
+    ColoredScatterPlot,
+    SimpleBoxPlot,
+    SimpleSwarmPlot,
+    SimpleViolinPlot,
+    SimpleMosaicPlot
+]

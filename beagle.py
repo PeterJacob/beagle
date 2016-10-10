@@ -2,19 +2,6 @@ import plotting
 
 
 class Beagle(object):
-    default_plot_classes = [
-        plotting.SimpleCountPlot,
-        plotting.CategoryCountPlot,
-        plotting.OneDimKernelEstimationPlot,
-        plotting.TwoDimKernelEstimationPlot,
-        plotting.SimpleScatterPlot,
-        plotting.ColoredScatterPlot,
-        plotting.SimpleBoxPlot,
-        plotting.SimpleSwarmPlot,
-        plotting.SimpleViolinPlot,
-        plotting.SimpleMosaicPlot
-    ]
-
     def __init__(self, dataset, base_dir='./out/'):
         """Interactive data exploration tool
         
@@ -107,7 +94,7 @@ class Beagle(object):
     def generate_appropriate_plots(self, columns, threshold):
         """For one or multiple columns, generates plots above threshold"""
         file_nums_used = []
-        for plot_class in self.default_plot_classes:
+        for plot_class in plotting.all_plot_classes:
             score = plot_class.appropriate_score(
                 columns, self.dataset, self.column_meta)
 
