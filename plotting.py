@@ -24,6 +24,30 @@ class SimpleCountPlot(object):
         plt.close()
 
 
+class CategoryCountPlot(object):
+    @staticmethod
+    def appropriate_score(column_names, dataset, dataset_meta):
+        """Returns a score for appropriateness of a category count plot"""
+        probable_types = [dataset_meta[column_name]['probable_type']
+                          for column_name in column_names]
+        if (len(column_names) == 2 and
+            (sorted(probable_types) == ['Category', 'Category'] or
+             sorted(probable_types) == ['Binary', 'Category'] or
+             sorted(probable_types) == ['Binary', 'Binary'])):
+            return 2  # Very appropriate
+        else:
+            return 0  # Not appropriate
+
+    @staticmethod
+    def generate_plot(column_names, dataset, dataset_meta,
+                      filename, figsize=(6, 4.5)):
+        plt.figure(figsize=figsize)
+        sns.countplot(x=column_names[0], hue=column_names[1], data=dataset)
+        plt.tight_layout()
+        plt.savefig(filename)
+        plt.close()
+
+
 class OneDimKernelEstimationPlot(object):
     @staticmethod
     def appropriate_score(column_names, dataset, dataset_meta):
@@ -243,7 +267,7 @@ class SimpleMosaicPlot(object):
             (sorted(probable_types) == ['Category', 'Category'] or
              sorted(probable_types) == ['Binary', 'Category'] or
              sorted(probable_types) == ['Binary', 'Binary'])):
-            return 2  # Very appropriate
+            return 1  # Moderately appropriate
         else:
             return 0  # Not appropriate
 

@@ -4,6 +4,7 @@ import plotting
 class Beagle(object):
     default_plot_classes = [
         plotting.SimpleCountPlot,
+        plotting.CategoryCountPlot,
         plotting.OneDimKernelEstimationPlot,
         plotting.TwoDimKernelEstimationPlot,
         plotting.SimpleScatterPlot,
